@@ -1,0 +1,4 @@
+﻿  test.cpp
+     Создается библиотека D:\Carus_prototype\cpp_files\CUDA_Oscillator_Network\x64\Debug\CUDA_Oscillator_Network.lib и объект D:\Carus_prototype\cpp_files\CUDA_Oscillator_Network\x64\Debug\CUDA_Oscillator_Network.exp
+LINK : warning LNK4098: библиотека по умолчанию "LIBCMT" конфликтует с использованием других библиотек; используйте /NODEFAULTLIB:library
+  CUDA_Oscillator_Network.vcxproj -> D:\Carus_prototype\cpp_files\CUDA_Oscillator_Network\x64\Debug\CUDA_Oscillator_Network.exe
