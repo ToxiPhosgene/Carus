@@ -6,7 +6,7 @@ type: software
 title: "Neuromorphic Network on Modified Chua Oscillators"
 version: 1.0.0
 date-released: "2026-04-05"
-license: MIT
+license: GPL-3.0
 repository-code: "https://github.com/ToxiPhosgene/Carus"
 url: "https://github.com/ToxiPhosgene/Carus"
 keywords:
