@@ -1,18 +1,10 @@
-"""
-В этом файле будут размещены все основные классы и функции необходимые для запуска, но не для обучения и инференса
-осцилляторной сети.
-
-Принимая сейчас это кольцо "Ignis Natus", я принимаю свою судьбу умереть молодым или стать бессмертным. Надевая сейчас
-это кольцо, я призываю всех своих существ из стали и силикона беречь мой огонь, что породил их.
-"""
-
 import torch
 from tqdm import tqdm
 
 
 class Oscillator:
     """
-    Это эталон
+    This is the benchmark
     """
     def __init__(self, volume, time_step=0.001, generator=None, seed=111, device="cpu"):
         self.time_step = time_step
@@ -32,7 +24,7 @@ class Oscillator:
 
 class Original_Chua_Oscillator(Oscillator):
     """
-    ОРИГИНАЛЬНЫЙ осциллятор Чуа с кусочно-линейной нелинейностью.
+    THE ORIGINAL Chua oscillator with piecewise linear nonlinearity.
     """
 
     def __init__(self, volume, alpha=8.98462, beta=14.286, m0=-1.143, m1=-0.714,
@@ -44,26 +36,26 @@ class Original_Chua_Oscillator(Oscillator):
         self.device = device
         self.dtype = dtype
 
-        # Параметры системы (оригинальные параметры Чуа)
+        # System parameters (original Chua's parameters)
         self.alpha = torch.full((1, volume), alpha, dtype=self.dtype, device=device)
         self.beta = torch.full((1, volume), beta, dtype=self.dtype, device=device)
         self.m0 = torch.full((1, volume), m0, dtype=self.dtype, device=device)
         self.m1 = torch.full((1, volume), m1, dtype=self.dtype, device=device)
 
-        # Начальные условия
+        # Initial conditions
         self.x = torch.full((1, volume), x0, dtype=self.dtype, device=device)
         self.y = torch.full((1, volume), y0, dtype=self.dtype, device=device)
         self.z = torch.full((1, volume), z0, dtype=self.dtype, device=device)
 
     def chua_nonlinearity(self, x):
-        """Кусочно-линейная характеристика диода Чуа"""
+        """Piecewise linear characteristic of the Chua's diode"""
         # f(x) = m1*x + 0.5*(m0 - m1)*(|x+1| - |x-1|)
         return self.m1 * x + 0.5 * (self.m0 - self.m1) * (
                 torch.abs(x + 1) - torch.abs(x - 1)
         )
 
     def equations(self, x, y, z, delta):
-        """Система дифференциальных уравнений Чуа"""
+        """The Chua's system of differential equations"""
         f = self.chua_nonlinearity(x)
         dx = self.alpha * (y - x - f) + delta
         dy = x - y + z
@@ -72,30 +64,30 @@ class Original_Chua_Oscillator(Oscillator):
 
     def __update_rk4(self, delta):
         """
-        Метод Рунге-Кутты 4-го порядка
+        The 4th order Runge-Kutta method
         """
-        # Шаг 1: Вычисляем коэффициенты k1
+        # Step 1: Calculate the coefficients k1
         k1x, k1y, k1z = self.equations(self.x, self.y, self.z, delta)
 
-        # Шаг 2: Вычисляем коэффициенты k2 (используем половинный шаг от k1)
+        # Step 2: Calculate the coefficients k2 (using a half step from k1)
         x_temp = self.x + k1x * self.dt / 2.0
         y_temp = self.y + k1y * self.dt / 2.0
         z_temp = self.z + k1z * self.dt / 2.0
         k2x, k2y, k2z = self.equations(x_temp, y_temp, z_temp, delta)
 
-        # Шаг 3: Вычисляем коэффициенты k3 (используем половинный шаг от k2)
+        # Step 3: Calculate the coefficients k3 (using a half step from k2)
         x_temp = self.x + k2x * self.dt / 2.0
         y_temp = self.y + k2y * self.dt / 2.0
         z_temp = self.z + k2z * self.dt / 2.0
         k3x, k3y, k3z = self.equations(x_temp, y_temp, z_temp, delta)
 
-        # Шаг 4: Вычисляем коэффициенты k4 (используем полный шаг от k3)
+        # Step 4: Calculate the coefficients k4 (using the full step from k3)
         x_temp = self.x + k3x * self.dt
         y_temp = self.y + k3y * self.dt
         z_temp = self.z + k3z * self.dt
         k4x, k4y, k4z = self.equations(x_temp, y_temp, z_temp, delta)
 
-        # Шаг 5: Обновляем состояния с правильными весами
+        # Step 5: Update the states with the correct weights
         self.x += (k1x + 2 * k2x + 2 * k3x + k4x) * self.dt / 6.0
         self.y += (k1y + 2 * k2y + 2 * k3y + k4y) * self.dt / 6.0
         self.z += (k1z + 2 * k2z + 2 * k3z + k4z) * self.dt / 6.0
@@ -117,7 +109,7 @@ class Original_Chua_Oscillator(Oscillator):
 
     def get_oscillation(self, x):
         """
-        Чисто для доступа к Рунге-Куртту
+        Purely for access to the Runge-Kurt
         :param x:
         :return:
         """
@@ -132,30 +124,30 @@ class Original_Chua_Oscillator(Oscillator):
 
 class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
     """
-    Вот тут, короче, реализовано:
-            - аксональная активность, чтобы заблокировать чрезмерно активные нейроны;
-            - гомеостатическая пластичность, чтобы плавно снижать активность нейронов, при их "зависании" в одной фазе;
-            - экспоненциальная средняя активность;
-            - нормализация.
+    Here, in short, it is implemented:
+            - axonal activity to block overactive neurons;
+            - homeostatic plasticity, in order to smoothly reduce the activity of neurons when they "hang" in one phase;
+            - exponential average activity;
+            - normalization.
     """
 
     def __init__(self, epsilon_g=5, epsilon_h=1, decay_memory=300, epsilon_homeostasis=10.0,
                  epsilon_axonal_activity=0.05, **kwargs):
         super().__init__(**kwargs)
         """            
-        epsilon_g: коэффициент регулирующий нормализацию;
-        epsilon_h: коэффициент регулирующий нормализацию;
-        decay_memory: коэффициент регулирующий затухание памяти активности;
-        epsilon_homeostasis: коэффициент регулирующий гомеостаз;
-        epsilon_axonal_activity: коэффициент регулирующий аксональную активность (активно влияет на DFA);
-        dtype: параметр отвечающий на каком типе данных работаем.
+        epsilon_g: coefficient regulating normalization;
+        epsilon_h: coefficient regulating normalization;
+        decay_memory: a coefficient that regulates the attenuation of activity memory;
+        epsilon_homeostasis: coefficient regulating homeostasis;
+        epsilon_axonal_activity: coefficient regulating axonal activity (actively affects DFA);
+        dtype: the parameter that corresponds to the type of data we are working on.
         """
-        # Расчитать как математически выразить g_k математически через epsilon или float16
+        # Calculate how to mathematically express g_k mathematically using epsilon or float16
         self.epsilon_g = epsilon_g
         self.epsilon_h = epsilon_h
 
         self.active_memory = torch.zeros(size=(1, self.alpha.size(dim=-1)), dtype=self.dtype, device=self.device)
-        self.decay_memory = 2 / (1 + decay_memory / self.dt)  # Можно расширить до случайного значения на каждый элемент системы
+        self.decay_memory = 2 / (1 + decay_memory / self.dt)  # It can be expanded to a random value for each element of the system.
         self.epsilon_homeostasis = epsilon_homeostasis
         self.homeostasis_ratio = torch.ones(size=self.alpha.size(), dtype=self.dtype, device=self.device)
 
@@ -164,7 +156,7 @@ class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
 
     def burn_transient(self, transient, disable_tqdm=False):
         """
-        Функция для пропускания транзитов.
+        A function for skipping transits.
 
         :param transient:
         :param disable_tqdm:
@@ -176,7 +168,7 @@ class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
 
     def __call__(self, x_input, *args, **kwargs):
         """
-        Последовательный вызов функций. Пайплайн прохода информации.
+        Sequential function calls. Information passage pipeline.
 
         :param x: входное значение
         :param args:
@@ -184,23 +176,23 @@ class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
         :return: выходное значение x
         """
 
-        x = self.forward(x_input)  # Пропускаем по определенным механизмам, в частности матричное умножение, что дает овербольшие значения
-        x = self._normalization(x)  # Приводим значения к какому-то более менее нормальному значению
-        x = self.get_oscillation(x)  # Производим осцилляцию (ака обработку) данных
-        x = self._homeostasis(x)  # Оцениваем "усталость" нейрона от пребывания в одной и той же фазе
-        x_out = self._axonal_activity(x)  # Оцениваем готовность аксона к потенциалу действия
+        x = self.forward(x_input)  # We skip by certain mechanisms, in particular matrix multiplication, which gives over-large values.
+        x = self._normalization(x)  # We bring the values to some more or less normal value.
+        x = self.get_oscillation(x)  # We produce data oscillation (aka processing)
+        x = self._homeostasis(x)  # We evaluate the "fatigue" of a neuron from staying in the same phase
+        x_out = self._axonal_activity(x)  # We evaluate the readiness of the axon for the action potential
 
         return x_out
 
     def _normalization(self, x):
         """
-        Данный блок стабилизирует хаотический аттрактор к циклическому
+        This block stabilizes the chaotic attractor to a cyclical one.
         :param x:
         :return:
 
-        Возможно стоит заменить на обыкновенную сигмоиду? А то у нас половина входных сигналов в инференсе будет +100 у.е.
-            Нет. Не стоит. Эксперименты подтвердили, что возведение экспоненты в степени >10 приводят к разносу сети.
-            Лучше настроить на гладкий спуск текущую систему. В ней нет степеней, что безопасно для входа.
+        Perhaps it should be replaced with an ordinary sigmoid? Otherwise, half of the input signals in the inference will be +100 units.
+            No. Not worth it. Experiments have confirmed that raising the exponent to a power of >10 leads to network separation.
+            It is better to set up the current system for a smooth descent. There are no degrees in it, which is safe to enter.
         """
         f = self.epsilon_g * torch.sin(3.14 / (2 * self.epsilon_g) * x)
         g = -x.abs() + self.epsilon_g
@@ -211,8 +203,8 @@ class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
 
     def _homeostasis(self, x):
         """
-        Подумать как внедрить этот гомеостаз на управление самим осциллятором, а не только выходным значением
-
+        Think about how to implement this homeostasis to control the oscillator itself, and not just the output value.
+        
         :param x:
         :return:
         """
@@ -228,15 +220,15 @@ class Neuromorphic_Oscillator_Chua(Original_Chua_Oscillator):
 
     def _axonal_activity(self, x):
         """
-        Данная функция напрямую влияет на осциллятор Чуа, а именно на коррекцию внутреннего состояния x, резко устремляя
-        его, если он выходит за допустимый диапазон.
+        This function directly affects the Chua oscillator, namely, the correction of the internal state of x, sharply directing
+        it is used if it is outside the acceptable range.
 
         :param x:
         :return:
         """
-        self.x = self.x * self.axonal_activity_ratio  # Сначала изменяем корректируем работу осциллятора
+        self.x = self.x * self.axonal_activity_ratio  # First, we change and adjust the operation of the oscillator
 
-        # Затем расчитываем новые корректоры на следующий шаг
+        # Then we calculate the new correctors for the next step.
         r = (1 / (self.x ** 2 + 1) - 0.5 * self.epsilon_axonal_activity) * self.epsilon_axonal_activity
         self.axonal_activity_ratio = (r / (r.abs() + 1e-3) + 1) * 0.5
         return x
