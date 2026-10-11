@@ -9,19 +9,13 @@ from matplotlib import pyplot as plt
 from scipy import stats
 import warnings
 
-# Подавляем только это конкретное предупреждение
 warnings.filterwarnings("ignore", message=".*Initial guess is not within the specified bounds.*")
-
-
-
-# torch.sparse.check_sparse_tensor_invariants.disable()
-
 
 def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
     """
-    Главный цикл
+    The main cycle
 
-    Здесь используется список с сигналами, для оценки доверительного интервала
+    Here, a list of signals is used to estimate the confidence interval.
 
     :param name:
     :param oscillator:
@@ -40,14 +34,14 @@ def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
     dtype = oscillator.dtype
     device = oscillator.device
     for _ in p_bar:
-        # Для установления равновесия осцилляторов
+        # To establish the equilibrium of the oscillators
         oscillator.burn_transient(int(transient / oscillator.dt), disable_tqdm=disable_tqdm)
 
         signal = []
 
         for i in tqdm(range(int(iteration / oscillator.dt)), desc=f"Collecting data - {name}",
                       disable=disable_tqdm):
-            if i % int(20 / oscillator.dt):  # Генерируем импульс каждые 20 секунд
+            if i % int(20 / oscillator.dt) == 0:  # We generate a pulse every 20 seconds
                 x = torch.zeros_like(oscillator.alpha)
                 noise = (torch.rand(size=(x.size(0), min(50, x.size(1))),
                                     dtype=dtype, device=device) * 2 - 1) * 0.1
@@ -80,29 +74,108 @@ def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
 def main():
     volume = 1000
     device = "cuda"
-    n = 1
+    n = 100
 
-    iteration = 60 * 5
+    iteration = 60 * 10
     transient = iteration * 4
 
     oscillators = {
-        f"volume: {volume}":
+        "volume: 15, float16":
             Neuromorphic_Oscillator_Network(
-                volume=volume,
+                volume=15,
 
                 transient=iteration * 4,
                 device=device,
                 dtype=torch.float16
             ),
+        "volume: 60, float16":
+            Neuromorphic_Oscillator_Network(
+                volume=60,
 
-        # f"volume: {volume * 4}":
-        #     Neuromorphic_Oscillator_Network(
-        #         volume=volume * 4,
-        #
-        #         transient=iteration * 4,
-        #         device=device,
-        #         dtype=torch.float16
-        #     ),
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float16
+            ),
+        "volume: 250, float16":
+            Neuromorphic_Oscillator_Network(
+                volume=250,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float16
+            ),
+        "volume: 1000, float16":
+            Neuromorphic_Oscillator_Network(
+                volume=1000,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float16
+            ),
+        "volume: 15, float32":
+            Neuromorphic_Oscillator_Network(
+                volume=15,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float32
+            ),
+        "volume: 60, float32":
+            Neuromorphic_Oscillator_Network(
+                volume=60,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float32
+            ),
+        "volume: 250, float32":
+            Neuromorphic_Oscillator_Network(
+                volume=250,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float32
+            ),
+        "volume: 1000, float32":
+            Neuromorphic_Oscillator_Network(
+                volume=1000,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float32
+            ),
+        "volume: 15, float64":
+            Neuromorphic_Oscillator_Network(
+                volume=15,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float64
+            ),
+        "volume: 60, float64":
+            Neuromorphic_Oscillator_Network(
+                volume=60,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float64
+            ),
+        "volume: 250, float64":
+            Neuromorphic_Oscillator_Network(
+                volume=250,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float64
+            ),
+        "volume: 1000, float64":
+            Neuromorphic_Oscillator_Network(
+                volume=1000,
+
+                transient=iteration * 4,
+                device=device,
+                dtype=torch.float64
+            )
     }
 
     if n == 1:
