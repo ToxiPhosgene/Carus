@@ -1,7 +1,7 @@
 """
-Не делайте мне мозги. Тут НЕОБХОДИМ torch.float16.
+Don't brainwash me. Torch.float16 IS NEEDED here.
 
-08.03.2026. Тип данных не влияет на качество, но влияет на скорость
+08.03.2026. The type of data does not affect the quality, but it does affect the speed.
 """
 from core_frame import *
 
@@ -16,20 +16,20 @@ from matplotlib import pyplot as plt
 class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
     def __init__(
             self,
-            # Пластичность
+            # Plasticity
             distribution_epsilon_weight=None,
             distribution_epsilon_weight_range=None,
             distribution_decay_activity_dendrites=None,
             distribution_amplitude_ltd=None,
             distribution_amplitude_ltp=None,
 
-            # Апоптоз и Нейрогенез
+            # Apoptosis and Neurogenesis
             distribution_apoptosis_threshold=None,
             distribution_inhibitory_ratio=None,
             distribution_neurogenesis_chance=None,
             distribution_new_connection_strength=None,
 
-            # Параметры осциллятора
+            # Oscillator Parameters
             distribution_alpha=None,
             distribution_beta=None,
             distribution_m0=None,
@@ -39,36 +39,36 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
             **kwargs):
         super().__init__(**kwargs)
 
-        # ================== ИНИЦИАЛИЗАЦИЯ ================= #
+        # ================== INITIALIZATION ================= #
         """
-        Это точечное управление. Точечное - потому что есть возможность настраивать на просто отдельные группки 
-        синапсов/нейронов, а вплоть до одного конкретного синапса/нейрона. Здесь, в этой структуре:
+        This is point control. Point-based - because it is possible to set up into just separate groups. 
+        synapses/neurons, and up to one specific synapse/neuron. Here, in this structure:
          [
                 {
-                    "start_X": 0,  - Начальная координата по X
-                    "end_X": 10,  - Конечная координата по X
-                    "start_Y": 0,  - Начальная координата по Y
-                    "end_Y": 13,  - Конечная координата по Y
-                    "start_value": 10.2,  - Начальное значение генерации
-                    "end_value": 10.8  - Конечное значение генерации
+                "start_X": 0, is the initial X coordinate
+                    "end_X": 10, is the final X coordinate
+                    "start_Y": 0, is the initial Y coordinate
+                    "end_Y": 13, is the final Y coordinate
+                    "start_value": 10.2, is the initial value of generation
+                    "end_value": 10.8 - The final value of generation
                 },
                 {
-                    "start_X": 3,  - Да, они могут накладываться для более сложного "рельефа"
+                    "start_X": 3, - Yes, they can overlap for a more complex "relief"
                     "end_X": 20,
-                    "start_Y": 15,  - Да, они могут быть одинаковыми, чтобы настроить точечно
+                    "start_Y": 15, - Yes, they can be the same to adjust the point
                     "end_Y": 15,
-                    "start_value": -5,  - Да, тут тоже могут быть одинаковы, чтобы заполнить конкретным числом
+                    "start_value": -5, - Yes, they can also be the same here to fill in a specific number
                     "end_value": -5
                 }
         ]
 
-        Для одномерного массива, просто пропадает "start_Y" и "end_Y". 
+        For a one-dimensional array, "start_Y" and "end_Y" simply disappear. 
 
         ToDo:
-            - Может в будущем сделать не чувствительность к этому?..
+            - Can I become insensitive to this in the future?..
         """
 
-        # Пластичность
+        # Plasticity
         if distribution_epsilon_weight is None:
             distribution_epsilon_weight = [
                 {
@@ -125,7 +125,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
                 }
             ]
 
-        # Нейрогенез и апоптоз
+        # Neurogenesis and apoptosis
         if distribution_apoptosis_threshold is None:
             distribution_apoptosis_threshold = [
                 {
@@ -171,7 +171,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
                 }
             ]
 
-        # Параметры осциллятора
+        # Oscillator Parameters
         if distribution_alpha is None:
             distribution_alpha = [
                 {
@@ -210,11 +210,11 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
             ]
         # ================================================== #
 
-        # ====== СОЗДАНИЕ МАТРИЦЫ СИНАПТИЧЕСКИХ ВЕСОВ ====== #
+        # ====== CREATING A MATRIX OF SYNAPTIC WEIGHTS ====== #
         self.weight = torch.zeros(size=(self.volume, self.volume), dtype=self.dtype, device=self.device)
         # ================================================== #
 
-        # ================== ПЛАСТИЧНОСТЬ ================== #
+        # ================== PLASTICITY ================== #
         self.epsilon_weight = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.epsilon_weight_range = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.decay_activity_dendrites = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
@@ -237,10 +237,10 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         self.__apply_distribution_2d(distribution_amplitude_ltp, self.amplitude_ltp)
 
         self.decay_activity_dendrites = 2 / (
-                    1 + self.decay_activity_dendrites / self.dt)  # Можно расширить до случайного значения на каждый элемент системы
+                    1 + self.decay_activity_dendrites / self.dt)  # It can be expanded to a random value for each element of the system.
         # ================================================== #
 
-        # =============== АПОПТОЗ И НЕЙРОГЕНЕЗ ============= #
+        # =============== SYNAPSE DEGENERATION AND NEUROGENESIS ============= #
         self.apoptosis_threshold = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.inhibitory_ratio = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.neurogenesis_chance = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
@@ -257,7 +257,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         self.__apply_distribution_2d(distribution_new_connection_strength, self.new_connection_strength)
         # ================================================== #
 
-        # ============== ВНУТРЕННЕЕ СОСТОЯНИЕ ============== #
+        # ============== INTERNAL CONDITION ============== #
         self.x_inter_weight = torch.zeros(size=(1, self.alpha.size(dim=-1)), dtype=self.dtype, device=self.device)
 
         self.alpha = torch.zeros_like(self.alpha, dtype=self.dtype, device=self.device)
@@ -272,25 +272,25 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         self.m0 = self.__apply_distribution_1d(distributions=distribution_m0, value=self.m0)
         self.m1 = self.__apply_distribution_1d(distributions=distribution_m1, value=self.m1)
         # ================================================== #
-        # self.burn_transient(transient=int(transient / self.dt))  # Для экспериментов отключен self.burn_transient
+        # self.burn_transient(transient=int(transient / self.dt))  # Self is disabled for experiments.burn_transient
 
     def forward(self, x_input):
         """
-        Важное уточнение, что в данном блоке происходит распараллеливание сигнала, поскольку импульс не только
-        обрабатывается, но и параллельно вычисляется.
-        Еще одно уточнение - здесь также есть внутреннее состояние сети. Т.е. не только сохраняется влияние осциллятора
-        самого на себя, но и осциллятора на осциллятор. Это решение весьма спорное.
+        An important clarification is that the signal is parallelized in this block, since the pulse is not only
+        it is processed, but it is also calculated in parallel.
+        Another clarification is that there is also an internal state of the network. That is, not only does the influence of the oscillator persist
+        on himself, but also the oscillator on the oscillator. This decision is highly controversial.
 
-        Да, можно было интегрированием через дифуры, но, c'mon, и так сложная система, а с этим мы вообще потеряем в
-        производительности
+        Yes, it was possible by integrating through diffraction, but, c'mon, it's already a complex system, and with this we will generally lose in
+        performance
 
-        :param x_input: Входной сигнал
-        :return x_out: Выходной сигнал
+        :param x_input: Input signal
+        :return x_out: Output signal
         """
         self.x_inter_weight += x_input
-        x_out = self.x_inter_weight @ self.weight  # Вычисляем выходной сигнал
+        x_out = self.x_inter_weight @ self.weight  # Calculating the output signal
 
-        self._plasticity(self.x_inter_weight)  # Обновляем веса
+        self._plasticity(self.x_inter_weight)  # Updating weights
         self._apoptosis()
         self._neurogenesis()
         self.x_inter_weight = x_out
@@ -303,42 +303,38 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         :param x: начальные входные данные
         :return:
         """
-        # Получаем поток информации через дендриты и находим скользящую среднюю активности
+        # We get the information flow through the dendrites and find the moving average of activity
         self.information_flow = self.weight * x.transpose(dim0=1, dim1=0)
-        # print((self.information_flow != 0).sum())
-        # print(self.information_flow.sum())
-        # self.ema_activity_dendrites = (self.decay_activity_dendrites * self.information_flow +
-        #                                self.ema_activity_dendrites * (1 - self.decay_activity_dendrites))
 
-        # Определяем изменение весов
+        # We determine the change in weights
         self.inc_weight = (self.amplitude_ltp - self.amplitude_ltp * (
             torch.sigmoid((self.epsilon_weight * self.information_flow) ** 3)) ** 0.1 -
                            self.amplitude_ltd * (torch.sigmoid(
                     (self.epsilon_weight_range * self.epsilon_weight * self.information_flow) ** 3)) ** 0.1)
         self.weight += self.inc_weight * self.weight / (
-                    self.weight.abs() + 1e-3) * self.dt  # Не забываем про знак синапса!
+                    self.weight.abs() + 1e-3) * self.dt  # Don't forget about the synapse sign!
 
     def _apoptosis(self):
         mask = (self.weight.abs() > self.apoptosis_threshold).to(dtype=self.weight.dtype, device=self.device)
         self.weight = self.weight * mask
 
     def _neurogenesis(self):
-        # Определяем какие нейроны будут созданы
+        # We determine which neurons will be created
         new_connection = (torch.rand(size=self.weight.size(), dtype=self.weight.dtype,
                                      device=self.device) < self.neurogenesis_chance).to(dtype=self.weight.dtype)
 
-        # Определяем которые из них будут тормозными
+        # We determine which of them will be braking
         new_connection *= ((torch.rand(size=self.weight.size(), dtype=self.weight.dtype,
                                        device=self.device) >= self.inhibitory_ratio).to(
             dtype=self.weight.dtype) * 2 - 1)
 
-        # Масштабируем силу связи
+        # Scaling the power of communication
         new_connection *= self.new_connection_strength
 
-        # Находим свободные связи в текущей матрице
+        # We find free connections in the current matrix
         new_connection = new_connection * (self.weight == 0)
 
-        # Добавляем к существующей матрице
+        # Adding to the existing matrix
         self.weight += new_connection
 
     def __standardize_distribution_1d(self, distributions):
