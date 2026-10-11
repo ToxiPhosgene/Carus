@@ -1,0 +1,8 @@
+tqdm>=4.67.1
+torch>=2.11.0+cu130
+nolds>=0.6.3
+scipy>=1.16.3
+matplotlib>=3.10.7
+powerlaw>=2.0.0
+h5py>=3.16.0
+pandas>=2.3.3
