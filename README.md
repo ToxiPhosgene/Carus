@@ -1,3 +1,4 @@
+![](assets/Logo_with_name.svg)
 # Neuromorphic Network on Modified Chua Oscillators
 Reproduces self-organized criticality in ensembles of 15–1000
 modified Chua oscillators with plastic synapses at float16/float32/float64.
@@ -18,10 +19,13 @@ modified Chua oscillators with plastic synapses at float16/float32/float64.
 ## Project Structure
 ```
 Carus/
-├── cpp_files/CUDA_Oscillator_Network/
-├── critical_analysis/
-│ ├── stage_1_analysis.py # DFA and Hurst analysis
-│ └── stage_2_analysis.py # Crackling noise analysis
+├── cpp_files/CUDA_Oscillator_Network/  # Future work with C and CUDA
+├── critical_analysis/  # Directory with files for analysis criticaly in network
+│ ├── stage_2_analysis_libs  # Functions for stage_2_analysis.py
+│ ├── stage_1_analysis.py    # DFA and Hurst analysis
+│ ├── stage_2_analysis.py    # Crackling noise analysis
+│ ├── simple_example.py      # Example for fast check
+│ └── power_law_analysis.py  # File with all experiments what perfomed in article
 ├── core_frame.py # Base classes
 ├── soc_system.py # Neormorphic network class
 ├── power_law_analysis.py # Main file for total analysis
