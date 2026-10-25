@@ -3,8 +3,7 @@ Don't brainwash me. Torch.float16 IS NEEDED here.
 
 08.03.2026. The type of data does not affect the quality, but it does affect the speed.
 """
-from core_frame import *
-
+from core.core_frame import *
 import time
 import torch
 import nolds
@@ -109,8 +108,8 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
                     "end_X": self.volume,
                     "start_Y": 0,
                     "end_Y": self.volume,
-                    "start_value": 0.75,
-                    "end_value": 0.75
+                    "start_value": 0.5,
+                    "end_value": 0.5
                 }
             ]
         if distribution_amplitude_ltp is None:
@@ -210,11 +209,11 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
             ]
         # ================================================== #
 
-        # ====== CREATING A MATRIX OF SYNAPTIC WEIGHTS ====== #
+        # ====== CREATING A MATRIX OF SYNAPTIC WEIGHTS ===== #
         self.weight = torch.zeros(size=(self.volume, self.volume), dtype=self.dtype, device=self.device)
         # ================================================== #
 
-        # ================== PLASTICITY ================== #
+        # =================== PLASTICITY =================== #
         self.epsilon_weight = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.epsilon_weight_range = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.decay_activity_dendrites = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
@@ -240,7 +239,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
                     1 + self.decay_activity_dendrites / self.dt)  # It can be expanded to a random value for each element of the system.
         # ================================================== #
 
-        # =============== SYNAPSE DEGENERATION AND NEUROGENESIS ============= #
+        # ====== SYNAPSE DEGENERATION AND NEUROGENESIS ===== #
         self.apoptosis_threshold = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.inhibitory_ratio = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
         self.neurogenesis_chance = torch.zeros_like(input=self.weight, dtype=self.dtype, device=self.device)
@@ -257,7 +256,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         self.__apply_distribution_2d(distribution_new_connection_strength, self.new_connection_strength)
         # ================================================== #
 
-        # ============== INTERNAL CONDITION ============== #
+        # =============== INTERNAL CONDITION =============== #
         self.x_inter_weight = torch.zeros(size=(1, self.alpha.size(dim=-1)), dtype=self.dtype, device=self.device)
 
         self.alpha = torch.zeros_like(self.alpha, dtype=self.dtype, device=self.device)
@@ -272,7 +271,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         self.m0 = self.__apply_distribution_1d(distributions=distribution_m0, value=self.m0)
         self.m1 = self.__apply_distribution_1d(distributions=distribution_m1, value=self.m1)
         # ================================================== #
-        # self.burn_transient(transient=int(transient / self.dt))  # Self is disabled for experiments.burn_transient
+        # self.burn_transient(transient=int(transient / self.dt))  # Для экспериментов отключен self.burn_transient
 
     def forward(self, x_input):
         """
@@ -303,6 +302,9 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
         :param x: начальные входные данные
         :return:
         """
+        def h(x):
+            return -(x ** 2 - 1.5 * torch.e)
+
         # We get the information flow through the dendrites and find the moving average of activity
         self.information_flow = self.weight * x.transpose(dim0=1, dim1=0)
 
@@ -312,7 +314,7 @@ class Neuromorphic_Oscillator_Network(Neuromorphic_Oscillator_Chua):
                            self.amplitude_ltd * (torch.sigmoid(
                     (self.epsilon_weight_range * self.epsilon_weight * self.information_flow) ** 3)) ** 0.1)
         self.weight += self.inc_weight * self.weight / (
-                    self.weight.abs() + 1e-3) * self.dt  # Don't forget about the synapse sign!
+                self.weight.abs() + 1e-3) * self.dt  # Don't forget about the synapse sign!
 
     def _apoptosis(self):
         mask = (self.weight.abs() > self.apoptosis_threshold).to(dtype=self.weight.dtype, device=self.device)
