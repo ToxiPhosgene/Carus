@@ -1,5 +1,5 @@
-from core_frame import *
-from soc_system import *
+from core.core_frame import *
+from core.soc_system import *
 from critical_analysis.stage_1_analysis import *
 from critical_analysis.stage_2_analysis import *
 
@@ -10,6 +10,13 @@ from scipy import stats
 import warnings
 
 warnings.filterwarnings("ignore", message=".*Initial guess is not within the specified bounds.*")
+warnings.filterwarnings('ignore', module='powerlaw')
+warnings.filterwarnings('ignore', module='scipy.optimize')
+warnings.filterwarnings('ignore', module='library')
+
+
+# torch.sparse.check_sparse_tensor_invariants.disable()
+
 
 def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
     """
@@ -55,6 +62,7 @@ def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
             signal.append(
                 x.clone().detach().cpu()
             )
+
         signal = torch.concatenate(
             tensors=signal,
             dim=0
@@ -66,11 +74,11 @@ def run_cycle(name, oscillator, n, disable_tqdm, iteration, transient):
 
 @torch.no_grad()
 def main():
+    volume = 1000
     device = "cuda"
-    n = 4
+    n = 100
 
-
-    iteration = 60 * 0.5
+    iteration = 60 * 10
     transient = iteration * 4
 
     oscillators = {
@@ -177,6 +185,7 @@ def main():
     else:
         disable_tqdm = True
 
+
     for name in oscillators:
         results = dict()  # Dictionary for analysis
 
@@ -192,7 +201,8 @@ def main():
         # Output of results
         print("\nHEARST AND DFA ANALYSIS")
         print(f"HEARST:                {results['dfa_herst']['h']['mean']:.4f}±{results['dfa_herst']['h']['std']: .4f}")
-        print(f"DFA:                  {results['dfa_herst']['dfa']['mean']:.4f}±{results['dfa_herst']['dfa']['std']: .4f}")
+        print(
+            f"DFA:                  {results['dfa_herst']['dfa']['mean']:.4f}±{results['dfa_herst']['dfa']['std']: .4f}")
         print(f"Acceptable by Херсту:{results['dfa_herst']['ratio_h']: .2f}%")
         print(f"Acceptable by DFA:      {results['dfa_herst']['ratio_dfa']: .2f}%")
         print()
@@ -205,8 +215,32 @@ def main():
                   f"tau_t: {results['crackling_noise']['tau_t'][kid]['slope']:.3f}±{results['crackling_noise']['tau_t'][kid]['std']:.3f}\n"
                   f"ratio: {results['crackling_noise']['ratio'][kid]['slope']:.3f}±{results['crackling_noise']['ratio'][kid]['std']:.3f}")
         print(f"Best result with k = {results['crackling_noise']['best']['k']}")
-        print(f"gamma = {results['crackling_noise']['best']['slope']:.3f}±{results['crackling_noise']['best']['slope_err']:.3f}\n"
-              f"ratio = {results['crackling_noise']['best']['ratio']:.3f}±{results['crackling_noise']['best']['ratio_err']:.3f}")
+        print(
+            f"gamma = {results['crackling_noise']['best']['slope']:.3f}±{results['crackling_noise']['best']['slope_err']:.3f}\n"
+            f"ratio = {results['crackling_noise']['best']['ratio']:.3f}±{results['crackling_noise']['best']['ratio_err']:.3f}")
+
+        with open(f"{name.replace(':', '_').replace(',', '_').replace(' ', '')}.txt", "w") as f:
+            # Output of results
+            print("\nHEARST AND DFA ANALYSIS")
+            print(
+                f"HEARST:                {results['dfa_herst']['h']['mean']:.4f}±{results['dfa_herst']['h']['std']: .4f}")
+            print(
+                f"DFA:                  {results['dfa_herst']['dfa']['mean']:.4f}±{results['dfa_herst']['dfa']['std']: .4f}")
+            print(f"Acceptable by Херсту:{results['dfa_herst']['ratio_h']: .2f}%")
+            print(f"Acceptable by DFA:      {results['dfa_herst']['ratio_dfa']: .2f}%")
+            print()
+
+            print("CRACKLING NOISE ANALYSIS")
+            for kid in results['crackling_noise']['ratio']:
+                print(f"k = {kid}\n"
+                      f"gamma: {results['crackling_noise']['gamma'][kid]['slope']:.3f}±{results['crackling_noise']['gamma'][kid]['std']:.3f}\n"
+                      f"tau  : {results['crackling_noise']['tau'][kid]['slope']:.3f}±{results['crackling_noise']['tau'][kid]['std']:.3f}\n"
+                      f"tau_t: {results['crackling_noise']['tau_t'][kid]['slope']:.3f}±{results['crackling_noise']['tau_t'][kid]['std']:.3f}\n"
+                      f"ratio: {results['crackling_noise']['ratio'][kid]['slope']:.3f}±{results['crackling_noise']['ratio'][kid]['std']:.3f}")
+            print(f"Best result with k = {results['crackling_noise']['best']['k']}")
+            print(
+                f"gamma = {results['crackling_noise']['best']['slope']:.3f}±{results['crackling_noise']['best']['slope_err']:.3f}\n"
+                f"ratio = {results['crackling_noise']['best']['ratio']:.3f}±{results['crackling_noise']['best']['ratio_err']:.3f}")
 
 
 if __name__ == "__main__":
