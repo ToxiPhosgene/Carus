@@ -1,4 +1,4 @@
-from soc_system import *
+from core.soc_system import *
 import nolds
 
 
