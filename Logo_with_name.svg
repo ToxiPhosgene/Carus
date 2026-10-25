@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Создано Microsoft Visio, экспорт SVG Logo_with_name.svg Page-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="11.6929in" height="8.26772in"
+		viewBox="0 0 841.89 595.276" xml:space="preserve" color-interpolation-filters="sRGB" class="st6">
+	<v:documentProperties v:langID="1049" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#000000;stroke:#000000;stroke-width:0.25}
+		.st2 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st3 {stroke:#000000;stroke-width:1}
+		.st4 {fill:none;stroke:none;stroke-width:0.25}
+		.st5 {fill:#000000;font-family:Times New Roman;font-size:1.99999em}
+		.st6 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="msvThemeOrder" v:val="VT0(0):26"/>
+		</v:userDefs>
+		<title>Страница-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="Соединительная линия" v:index="0"/>
+		<g id="shape7-1" v:mID="7" v:groupContext="shape" transform="translate(177.165,-392.002)">
+			<title>Лист.7</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape17-3" v:mID="17" v:groupContext="shape" transform="translate(304.724,-392.002)">
+			<title>Лист.17</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape18-5" v:mID="18" v:groupContext="shape" transform="translate(262.205,713.622) rotate(180)">
+			<title>Лист.18</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape19-7" v:mID="19" v:groupContext="shape" transform="translate(262.205,841.181) rotate(180)">
+			<title>Лист.19</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape20-9" v:mID="20" v:groupContext="shape" transform="translate(612.524,-274.133) rotate(45)">
+			<title>Лист.20</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape21-11" v:mID="21" v:groupContext="shape" transform="translate(702.565,-183.778) rotate(45)">
+			<title>Лист.21</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape22-13" v:mID="22" v:groupContext="shape" transform="translate(702.643,-273.896) rotate(45)">
+			<title>Лист.22</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape23-15" v:mID="23" v:groupContext="shape" transform="translate(612.288,-183.856) rotate(45)">
+			<title>Лист.23</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape30-17" v:mID="30" v:groupContext="shape" transform="translate(177.165,-519.449)">
+			<title>Лист.30</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape38-19" v:mID="38" v:groupContext="shape" transform="translate(304.724,-264.443)">
+			<title>Лист.38</title>
+			<ellipse cx="10.6299" cy="584.646" rx="10.6299" ry="10.6299" class="st1"/>
+		</g>
+		<g id="shape39-21" v:mID="39" v:groupContext="shape" v:layerMember="0" transform="translate(180.709,-519.449)">
+			<title>Динамическая соединительная линия</title>
+			<path d="M7.09 595.28 L7.09 701.46" class="st2"/>
+		</g>
+		<g id="shape40-24" v:mID="40" v:groupContext="shape" v:layerMember="0" transform="translate(190.128,-519.721)">
+			<title>Динамическая соединительная линия.40</title>
+			<path d="M0.06 595.28 L14.11 656.15" class="st2"/>
+		</g>
+		<g id="shape41-27" v:mID="41" v:groupContext="shape" v:layerMember="0" transform="translate(195.312,-522.562)">
+			<title>Динамическая соединительная линия.41</title>
+			<path d="M0 595.28 L48.75 644.02" class="st2"/>
+		</g>
+		<g id="shape42-30" v:mID="42" v:groupContext="shape" v:layerMember="0" transform="translate(196.295,-523.695)">
+			<title>Динамическая соединительная линия.42</title>
+			<path d="M0 595.28 L91.96 664.34" class="st2"/>
+		</g>
+		<g id="shape47-33" v:mID="47" v:groupContext="shape" v:layerMember="0" transform="translate(216.159,-355.561)">
+			<title>Динамическая соединительная линия.47</title>
+			<path d="M0 596.83 L25.65 607.89" class="st2"/>
+		</g>
+		<g id="shape48-36" v:mID="48" v:groupContext="shape" v:layerMember="0" transform="translate(217.027,-365.256)">
+			<title>Динамическая соединительная линия.48</title>
+			<path d="M0 602.33 L69.02 602.39" class="st2"/>
+		</g>
+		<g id="shape49-39" v:mID="49" v:groupContext="shape" v:layerMember="0" transform="translate(216.24,-362.221)">
+			<title>Динамическая соединительная линия.49</title>
+			<path d="M0 595.28 L89.27 558.88" class="st2"/>
+		</g>
+		<g id="shape50-42" v:mID="50" v:groupContext="shape" v:layerMember="0" transform="translate(213.927,-365.712)">
+			<title>Динамическая соединительная линия.50</title>
+			<path d="M0 595.28 L75.3 520.24" class="st2"/>
+		</g>
+		<g id="shape51-45" v:mID="51" v:groupContext="shape" v:layerMember="0" transform="translate(210.496,-368.016)">
+			<title>Динамическая соединительная линия.51</title>
+			<path d="M0 595.28 L36.98 506.8" class="st2"/>
+		</g>
+		<g id="shape52-48" v:mID="52" v:groupContext="shape" v:layerMember="0" transform="translate(199.429,-368.838)">
+			<title>Динамическая соединительная линия.52</title>
+			<path d="M7 595.28 L7.18 526.26" class="st2"/>
+		</g>
+		<g id="shape53-51" v:mID="53" v:groupContext="shape" v:layerMember="0" transform="translate(204.183,-368.013)">
+			<title>Динамическая соединительная линия.53</title>
+			<path d="M-1.89 595.28 L-12.28 570.46" class="st2"/>
+		</g>
+		<g id="shape54-54" v:mID="54" v:groupContext="shape" v:layerMember="0" transform="translate(261.34,-341.348)">
+			<title>Динамическая соединительная линия.54</title>
+			<path d="M0 593.69 L25.57 582.69" class="st2"/>
+		</g>
+		<g id="shape55-57" v:mID="55" v:groupContext="shape" v:layerMember="0" transform="translate(259.085,-346.263)">
+			<title>Динамическая соединительная линия.55</title>
+			<path d="M0 595.28 L48.76 546.43" class="st2"/>
+		</g>
+		<g id="shape56-60" v:mID="56" v:groupContext="shape" v:layerMember="0" transform="translate(255.629,-348.567)">
+			<title>Динамическая соединительная линия.56</title>
+			<path d="M0 595.28 L37.07 505.42" class="st2"/>
+		</g>
+		<g id="shape57-63" v:mID="57" v:groupContext="shape" v:layerMember="0" transform="translate(244.488,-349.37)">
+			<title>Динамическая соединительная линия.57</title>
+			<path d="M7.09 595.28 L7.09 488.98" class="st2"/>
+		</g>
+		<g id="shape58-66" v:mID="58" v:groupContext="shape" v:layerMember="0" transform="translate(247.547,-348.577)">
+			<title>Динамическая соединительная линия.58</title>
+			<path d="M0 595.28 L-36.88 505.2" class="st2"/>
+		</g>
+		<g id="shape59-69" v:mID="59" v:groupContext="shape" v:layerMember="0" transform="translate(244.065,-346.263)">
+			<title>Динамическая соединительная линия.59</title>
+			<path d="M0 595.28 L-48.76 546.43" class="st2"/>
+		</g>
+		<g id="shape60-72" v:mID="60" v:groupContext="shape" v:layerMember="0" transform="translate(298.928,-367.931)">
+			<title>Динамическая соединительная линия.60</title>
+			<path d="M1.86 595.28 L12.31 570.38" class="st2"/>
+		</g>
+		<g id="shape61-75" v:mID="61" v:groupContext="shape" v:layerMember="0" transform="translate(289.627,-368.76)">
+			<title>Динамическая соединительная линия.61</title>
+			<path d="M7.06 595.28 L7.12 526.42" class="st2"/>
+		</g>
+		<g id="shape62-78" v:mID="62" v:groupContext="shape" v:layerMember="0" transform="translate(292.584,-367.941)">
+			<title>Динамическая соединительная линия.62</title>
+			<path d="M0 595.28 L-36.92 506.73" class="st2"/>
+		</g>
+		<g id="shape63-81" v:mID="63" v:groupContext="shape" v:layerMember="0" transform="translate(289.171,-365.659)">
+			<title>Динамическая соединительная линия.63</title>
+			<path d="M0 595.28 L-75.03 519.98" class="st2"/>
+		</g>
+		<g id="shape64-84" v:mID="64" v:groupContext="shape" v:layerMember="0" transform="translate(286.834,-362.152)">
+			<title>Динамическая соединительная линия.64</title>
+			<path d="M0 595.28 L-89.2 558.82" class="st2"/>
+		</g>
+		<g id="shape65-87" v:mID="65" v:groupContext="shape" v:layerMember="0" transform="translate(313.14,-412.475)">
+			<title>Динамическая соединительная линия.65</title>
+			<path d="M-1.8 595.28 L-12.37 569.34" class="st2"/>
+		</g>
+		<g id="shape66-90" v:mID="66" v:groupContext="shape" v:layerMember="0" transform="translate(307.831,-410.141)">
+			<title>Динамическая соединительная линия.66</title>
+			<path d="M0 595.28 L-48.73 546.63" class="st2"/>
+		</g>
+		<g id="shape67-93" v:mID="67" v:groupContext="shape" v:layerMember="0" transform="translate(305.56,-406.762)">
+			<title>Динамическая соединительная линия.67</title>
+			<path d="M0 595.28 L-89.13 557.68" class="st3"/>
+		</g>
+		<g id="shape68-96" v:mID="68" v:groupContext="shape" v:layerMember="0" transform="translate(304.724,-395.545)">
+			<title>Динамическая соединительная линия.68</title>
+			<path d="M0 588.19 L-106.3 588.19" class="st2"/>
+		</g>
+		<g id="shape69-99" v:mID="69" v:groupContext="shape" v:layerMember="0" transform="translate(286.881,-450.187)">
+			<title>Динамическая соединительная линия.69</title>
+			<path d="M0 593.27 L-25.44 583.11" class="st2"/>
+		</g>
+		<g id="shape70-102" v:mID="70" v:groupContext="shape" v:layerMember="0" transform="translate(286.123,-441.28)">
+			<title>Динамическая соединительная линия.70</title>
+			<path d="M0 588.28 L-68.86 588.1" class="st2"/>
+		</g>
+		<g id="shape71-105" v:mID="71" v:groupContext="shape" v:layerMember="0" transform="translate(286.947,-444.143)">
+			<title>Динамическая соединительная линия.71</title>
+			<path d="M0 595.28 L-89.35 632.68" class="st2"/>
+		</g>
+		<g id="shape72-108" v:mID="72" v:groupContext="shape" v:layerMember="0" transform="translate(241.693,-464.479)">
+			<title>Динамическая соединительная линия.72</title>
+			<path d="M0 597.37 L-25.18 607.35" class="st2"/>
+		</g>
+		<g id="shape73-111" v:mID="73" v:groupContext="shape" v:layerMember="0" transform="translate(244.052,-458.789)">
+			<title>Динамическая соединительная линия.73</title>
+			<path d="M0 595.28 L-48.73 643.92" class="st2"/>
+		</g>
+		<g id="shape74-114" v:mID="74" v:groupContext="shape" v:layerMember="0" transform="translate(204.301,-438.652)">
+			<title>Динамическая соединительная линия.74</title>
+			<path d="M-1.71 595.28 L-12.47 621.46" class="st2"/>
+		</g>
+		<g id="shape75-117" v:mID="75" v:groupContext="shape" v:layerMember="0" transform="translate(259.098,-331.23)">
+			<title>Динамическая соединительная линия.75</title>
+			<path d="M0 595.28 L48.73 643.92" class="st2"/>
+		</g>
+		<g id="shape76-120" v:mID="76" v:groupContext="shape" v:layerMember="0" transform="translate(298.928,-347.759)">
+			<title>Динамическая соединительная линия.76</title>
+			<path d="M0.08 595.28 L14.09 657.59" class="st2"/>
+		</g>
+		<g id="shape77-123" v:mID="77" v:groupContext="shape" v:layerMember="0" transform="translate(322.441,-392.002)">
+			<title>Динамическая соединительная линия.77</title>
+			<path d="M-7.09 595.28 L-7.09 701.57" class="st2"/>
+		</g>
+		<g id="shape80-126" v:mID="80" v:groupContext="shape" v:layerMember="0" transform="translate(212.28,-439.479)">
+			<title>Динамическая соединительная линия.80</title>
+			<path d="M0 595.28 L97.43 750.68" class="st2"/>
+		</g>
+		<g id="shape81-129" v:mID="81" v:groupContext="shape" v:layerMember="0" transform="translate(195.312,-395.115)">
+			<title>Динамическая соединительная линия.81</title>
+			<path d="M0 595.28 L112.53 707.8" class="st2"/>
+		</g>
+		<g id="shape82-132" v:mID="82" v:groupContext="shape" v:layerMember="0" transform="translate(214.848,-351.76)">
+			<title>Динамическая соединительная линия.82</title>
+			<path d="M0 595.28 L92.06 665.52" class="st2"/>
+		</g>
+		<g id="shape85-135" v:mID="85" v:groupContext="shape" v:layerMember="0" transform="translate(193.482,-521.098)">
+			<title>Динамическая соединительная линия.85</title>
+			<path d="M0 595.28 L97.51 749.26" class="st2"/>
+		</g>
+		<g id="shape86-138" v:mID="86" v:groupContext="shape" transform="translate(176.882,-243.183)">
+			<title>Лист.86</title>
+			<desc>CARUS</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="74.5512" cy="584.646" width="149.11" height="21.2598"/>
+			<rect x="0" y="574.016" width="149.102" height="21.2598" class="st4"/>
+			<text x="34.54" y="591.85" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>CARUS</text>		</g>
+	</g>
+</svg>
