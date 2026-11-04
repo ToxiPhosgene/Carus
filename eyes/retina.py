@@ -237,7 +237,7 @@ def dog_kernel(size=9, sigma_c=1.0, sigma_s=3.0, last_layer=False, on_center=Tru
     k = kc - ks                           # center without periphery
     k = k - k.mean()
     k = torch.concatenate([k.unsqueeze(dim=0) for _ in range(3)]).unsqueeze(dim=dim_)
-    k = torch.ones(size=(3, 1, int(size), int(size))) / size ** 2
+    # k = torch.ones(size=(3, 1, int(size), int(size))) / size ** 2
     return -k if on_center else k
 
 
