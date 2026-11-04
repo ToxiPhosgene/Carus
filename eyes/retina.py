@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from PIL import Image
 from torchvision import transforms
 from matplotlib import pyplot as plt
@@ -9,89 +6,76 @@ from torch import nn
 from torch.nn import functional as F
 import math
 from tqdm import tqdm
+import os
+
+torch.manual_seed(111)
+permanent_path_to_img = "images_for_test/"
+path_to_files_for_article = "files_for_article/"
+
+# Transformation to tensor and back
+transform = transforms.Compose([
+    transforms.ToTensor(),
+])
+reverse_transform = transforms.ToPILImage()
+
+def find_center(img_size: torch.Size) -> torch.Tensor:
+    height = img_size[-1] // 2
+    width = img_size[-2] // 2
+    center = torch.tensor(data=[width, height], dtype=torch.int)
+    return center
 
 
 class Retina(nn.Module):
-    def __init__(self, img_size: torch.Size, maximum_in_periphery: int, last_layer: float, collision: float, *, dtype=torch.float32) -> None:
+    def __init__(self, img_size: torch.Size, maximum_in_periphery: int, last_layer: bool, collision: float, *, dtype=torch.float32) -> None:
         super().__init__()
         self.dtype = dtype
         self.maximum_in_periphery = maximum_in_periphery
-        self.fovea_area = 0
         self.last_layer = last_layer
 
-        self.center = self.__find_center(img_size)
-        self.off_receptor_field = self.__get_receptor_field(img_size, self.fovea_area, collision, on_center=False)
-        self.on_receptor_field = self.__get_receptor_field(img_size, self.fovea_area, collision, on_center=True)
+        self.center = find_center(img_size)
+        """
+        The structure of receptor field dictionary:
+        
+            _receptor_field = {
+                size:
+                    "kernel":
+                    "mask":
+            }
+        """
+        self.off_receptor_field = self.__get_receptor_field(img_size, collision, on_center=False)
+        self.on_receptor_field = self.__get_receptor_field(img_size, collision, on_center=True)
 
-        self.off_receptor_field = self.off_receptor_field[0::2]
-        self.on_receptor_field = self.on_receptor_field[1::2]
+        self.sizes_off = list(self.off_receptor_field.keys())
+        self.sizes_on = list(self.on_receptor_field.keys())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        lst = []
-        for on_kernel, off_kernel in tqdm(zip(self.on_receptor_field, self.off_receptor_field), desc="A convolution is taking place"):
-            for x_sign in [-1, 1]:
-                for y_sign in [-1, 1]:
-                    lst.append(
-                        self.conv_at_point(
-                            x,
-                            on_kernel['kernal'],
-                            self.center[0] + y_sign * on_kernel['y'],
-                            self.center[1] + x_sign * on_kernel['x'],
-                        )
-                    )
+        height = x.size(dim=-2)
+        width = x.size(dim=-1)
 
-                    lst.append(
-                        self.conv_at_point(
-                            x,
-                            off_kernel['kernal'],
-                            self.center[0] + y_sign * off_kernel['y'],
-                            self.center[1] + x_sign * off_kernel['x'],
-                        )
-                    )
+        groups = 1 if self.last_layer else 3
 
-        img_rf = self.recovery_img(lst)
-        return img_rf
+        off_img_rf = torch.zeros_like(x)
+        on_img_rf = torch.zeros_like(x)
 
-    def recovery_img(self, x: list) -> torch.Tensor:
-        """
-        This function is recovery images from list to quarter pieces and then concatenate them all
-        :param x:
-        :return:
-        """
-        channels = 1 if self.last_layer else 3
+        for off_center_key, on_center_key in tqdm(zip(self.sizes_off, self.sizes_on)):
+            off_kernel = self.off_receptor_field[off_center_key]["kernel"]
+            on_kernel = self.on_receptor_field[on_center_key]["kernel"]
 
-        def to_quarter(tiles):
-            q = torch.cat(tiles, dim=-1)
-            target_shape = (channels, self.y_conv.item(), self.x_conv.item())
-            print(target_shape)
+            off_mask = self.off_receptor_field[off_center_key]["mask"]
+            on_mask = self.on_receptor_field[on_center_key]["mask"]
 
-            if q.numel() > channels * self.y_conv * self.x_conv:
-                q = q[:, :, :, :self.y_conv * self.x_conv]
-            elif q.numel() < channels * self.y_conv * self.x_conv:
-                k = self.x_conv / self.y_conv
-                most_probable_dimension_x, most_probable_dimension_y =  torch.sqrt(q.size(dim=-1) * k).int(), torch.sqrt(q.size(dim=-1) / k).int()
+            off_img_rf += conv_keep_size(x, off_kernel, groups=groups) * off_mask
+            on_img_rf += conv_keep_size(x, on_kernel, groups=groups) * on_mask
 
-                self.y_conv, self.x_conv = most_probable_dimension_y, most_probable_dimension_x
-                q = q[:, :, :, :self.y_conv * self.x_conv]
+            # Проверка: размеры должны совпадать с входом
+            assert off_img_rf.shape[-2:] == (height, width), (off_img_rf.shape, height, width)
+            assert on_img_rf.shape[-2:] == (height, width), (on_img_rf.shape, height, width)
 
-                # raise ValueError(
-                #     f"Too small input tensor: получено {tuple(q.shape)} "
-                #     f"(numel={q.numel()}), ожидалось {target_shape} "
-                #     f"(numel={channels * self.y_conv * self.x_conv})"
-                # )
-            target_shape = (channels, self.y_conv.item(), self.x_conv.item())
-            print(target_shape, q.size())
-            return q.reshape(target_shape)  # reshape безопаснее view
+        # Firstly, we computed the receptor fields and when we are calculating activation. Just because receptor fields have influence from neighborhood field
+        off_img_rf = F.relu(remove_zero_rows_cols(off_img_rf))  # Оставляем relu, т.к. leaky лишь масштабирует сумму на (1−α). Выбор relu/leaky = вопрос усиления, а не формы нелинейности
+        on_img_rf = F.relu(remove_zero_rows_cols(on_img_rf))
 
-        top_left = to_quarter([x for pair in zip(x[0::8], x[1::8]) for x in pair])
-        down_left = to_quarter([x for pair in zip(x[2::8], x[3::8]) for x in pair])
-        top_right = to_quarter([x for pair in zip(x[4::8], x[5::8]) for x in pair])
-        down_right = to_quarter([x for pair in zip(x[6::8], x[7::8]) for x in pair])
-
-        top = torch.concatenate([top_left.flip([-1]), top_right], dim=-1)
-        button = torch.concatenate([down_left.flip([-1]), down_right], dim=-1)
-        x = torch.concatenate([top.flip([-2]), button], dim=-2)
-        return x
+        return on_img_rf + off_img_rf
 
     def __get_conv_by_axis(self, length, img_size, x_or_y:str, collision) -> torch.Tensor:
         s = []
@@ -99,14 +83,14 @@ class Retina(nn.Module):
             x = 0
             while x < length:
                 s.append(
-                  int(math.sqrt(self.__S_function(x, 0, w=img_size[2], h=img_size[1]))) + 1
+                    int(math.sqrt(self.s_function(x, 0, w=img_size[2], h=img_size[1]))) + 1
                 )
                 x += int(s[-1] * (1 - collision)) if int(s[-1] * (1 - collision)) != 0 else int(s[-1])
         elif x_or_y.lower() == "y":
             y = 0
             while y < length:
                 s.append(
-                  int(math.sqrt(self.__S_function(0, y, w=img_size[2], h=img_size[1]))) + 1
+                    int(math.sqrt(self.s_function(0, y, w=img_size[2], h=img_size[1]))) + 1
                 )
                 y += int(s[-1] * (1 - collision) if int(s[-1] * (1 - collision)) != 0 else int(s[-1]))
 
@@ -121,78 +105,55 @@ class Retina(nn.Module):
         conv = torch.concatenate(convs, dim=-1)
         return conv
 
-    def __get_receptor_field(self, img_size: torch.Size, fovea_area: int, collision: float, on_center: bool) -> list:
-        receptor_field = []
+    def __get_receptor_field(self, img_size: torch.Size, collision: float, on_center: bool) -> dict:
         center = self.center
         self.x_conv = self.__get_conv_by_axis(length=center[-1], img_size=img_size, x_or_y="x", collision=collision)
         self.y_conv = self.__get_conv_by_axis(length=center[-2], img_size=img_size, x_or_y="y", collision=collision)
-        conv = self.y_conv.T @ self.x_conv  # Матрица центров свертки
 
-        indices = torch.nonzero(conv, as_tuple=True)
-        conv[indices] = (minmax(1/(conv[indices])) + 1) * conv[indices].max()
-        conv = conv.sqrt().round()
+        """
+        receptor_field_sizes - this is how large receptor fields
+        receptor_placement - this is where cluster receptor is placement
+        """
 
-        # Новое. Реализует поиск уникальных размеров
-        sizes = conv.unique().tolist()
-        kernals = {}
-        for size in sizes:
+        receptor_field_sizes = self.y_conv.T @ self.x_conv  # Матрица центров свертки
+        receptor_field_sizes = receptor_field_sizes[:center[0], :center[1]]  # Crop the raw tensor to image size
+        receptor_placement = torch.zeros_like(receptor_field_sizes)
+
+        indices = torch.nonzero(receptor_field_sizes, as_tuple=True)
+        receptor_placement[indices] = (minmax(1/(receptor_field_sizes[indices])) + 1) * receptor_field_sizes[indices].max()
+        receptor_placement = receptor_placement.sqrt().round()
+
+        # Here we're finding unique IDs
+        receptor_ids = receptor_placement.unique()
+        receptor_ids = receptor_ids[torch.nonzero(receptor_ids, as_tuple=True)].tolist()
+
+        receptor_fields = {}
+
+        for size in receptor_ids:
+            receptor_fields[size] = {}
+            # When we're using then to create once the kernels with this IDs
             sigma = math.sqrt(size)
-            kernals[size] = dog_kernel(size=size, sigma_c=sigma, sigma_s=sigma * 3/2, last_layer=self.last_layer, on_center=on_center)
+            receptor_fields[size]["kernel"] = dog_kernel(size=size, sigma_c=sigma, sigma_s=sigma * 3 / 2, last_layer=self.last_layer, on_center=on_center)
 
-        i = 0
-        for index_0, index_1 in tqdm(zip(indices[0], indices[1]), desc="Creating kernels"):
-            kernal = kernals[conv[index_0, index_1].tolist()]
-            receptor_field.append(
-                {
-                    'x': index_1,
-                    'y': index_0,
-                    'kernal': kernal if kernal.sum() != 0 else kernal + (-1.0 if on_center else 1.0),
-                }
-            )
-            i += 1
+            # Here we're creating masks for convolution. We will being convolution few times instead of thousand
+            mask = (receptor_placement == size).float()
+            mask = torch.concatenate([torch.flip(mask, dims=[0]), mask], dim=0)
+            mask = torch.concatenate([torch.flip(mask, dims=[1]), mask], dim=1)
+            receptor_fields[size]["mask"] = mask
+
+        # This section is going to need in method self.recovery_img()
         self.x_conv = (self.x_conv != 0).sum()
         self.y_conv = (self.y_conv != 0).sum()
-        return receptor_field
+        return receptor_fields
 
-    def __find_center(self, img_size: torch.Size) -> torch.Tensor:
-        height = img_size[-1] // 2
-        width = img_size[-2] // 2
-        center = torch.tensor(data=[width, height], dtype=torch.int)
-        return center
-
-    def conv_at_point(self, x, kernel, i, j, padding=0):
-        """
-        x: (C_in, H, W) или (1, C_in, H, W)
-        kernel: (C_out, C_in, kH, kW)
-        i, j: координаты центра окна (в пикселях)
-        """
-        if x.dim() == 3:
-            x = x.unsqueeze(0)
-        kH, kW = kernel.shape[-2:]
-        rH, rW = kH // 2, kW // 2
-
-        H, W = x.size(-2), x.size(-1)          # H = rows, W = cols
-
-        # top-left corner of the window, clamped into the image
-        top  = min(max(i - rH, 0), H - kH)
-        left = min(max(j - rW, 0), W - kW)
-
-        patch = x[:, :, top:top + kH, left:left + kW]
-
-        assert patch.shape[-2:] == (kH, kW), (
-            f"patch {tuple(patch.shape[-2:])} != kernel {(kH, kW)} "
-            f"at (i={i}, j={j}), x shape={tuple(x.shape)}, rH={rH}, rW={rW}"
-        )
-        return F.conv2d(patch, kernel, groups=1 if self.last_layer else 3, padding=padding)
-
-    def __S_function(self, x, y, w, h):
+    def s_function(self, x, y, w, h):
         x = 2 * math.pi * (1 / w * x) ** 2
         y = 2 * math.pi * (1 / h * y) ** 2
-        dinominator = x + y + 1
+        denominator = x + y + 1
 
-        S_value = math.cos(- math.pi / dinominator) + 1
-        S_value = S_value * self.maximum_in_periphery * 0.5
-        return S_value
+        s_value = math.cos(- math.pi / denominator) + 1
+        s_value = s_value * self.maximum_in_periphery * 0.5
+        return s_value
 
 
 def minmax(x):
@@ -230,7 +191,7 @@ def gaussian_kernel(size, sigma):
     return g / g.sum()
 
 
-def dog_kernel(size=9, sigma_c=1.0, sigma_s=3.0, last_layer=False, on_center=True):
+def dog_kernel(size=9, sigma_c=1.0, sigma_s=3.0, last_layer: bool=False, on_center=True):
     dim_ = 0 if last_layer else 1
     kc = gaussian_kernel(size, sigma_c)
     ks = gaussian_kernel(size, sigma_s)
@@ -241,29 +202,57 @@ def dog_kernel(size=9, sigma_c=1.0, sigma_s=3.0, last_layer=False, on_center=Tru
     return -k if on_center else k
 
 
+def symmetric_pad_for_conv(k):
+    """Возвращает (pad_left, pad_right) такие, что при stride=1, dilation=1
+    выход conv2d по данной оси равен входу. Работает для чётных и нечётных k."""
+    left = (k - 1) // 2
+    right = k - 1 - left          # для нечётного k: right == left; для чётного: right == left + 1
+    return left, right
+
+
+def conv_keep_size(x, weight, groups):
+    """conv2d с сохранением H и W для произвольного размера ядра."""
+    kh, kw = weight.shape[-2], weight.shape[-1]
+    pl_h, pr_h = symmetric_pad_for_conv(kh)
+    pl_w, pr_w = symmetric_pad_for_conv(kw)
+    # F.pad порядок для последних 2 измерений: (left, right, top, bottom)
+    x_padded = F.pad(x, (pl_w, pr_w, pl_h, pr_h))
+    return F.conv2d(x_padded, weight, stride=1, padding=0, groups=groups)
+
+
+def remove_zero_rows_cols(t: torch.Tensor):
+    # t: [C, H, W]
+    # строка H нулевая, если во всех C и W только нули
+    row_mask = (t != 0).any(dim=(0, 2))  # [H]
+    col_mask = (t != 0).any(dim=(0, 1))  # [W]
+
+    return t[:, row_mask][:, :, col_mask]
+
+
 def main():
-    # Transformation to tensor and back
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-    ])
-    reverse_transform = transforms.ToPILImage()
+    # Create a folders
+    if not os.path.isdir(permanent_path_to_img):
+        os.mkdir(permanent_path_to_img)
+    if not os.path.isdir(path_to_files_for_article):
+        os.mkdir(path_to_files_for_article)
 
     normal = normalization  # Select normalization tool
 
     # Open and transform images
-    permanent_path_to_img = "images_for_test/"
-    path_to_files_for_article = "files_for_article/"
-    img = Image.open(permanent_path_to_img + "2" + ".jpg")
+    img = Image.open(permanent_path_to_img + "Lenna" + ".png")
     img_ten = transform(img)
 
-    plt.imshow(img)
+    if img_ten.size(-1) % 2 != 0:
+        img_ten = img_ten[:, :, :-1]
+    if img_ten.size(-2) % 2 != 0:
+        img_ten = img_ten[:, :-1, :]
+
+    plt.imshow(reverse_transform(img_ten))
     print("Img size: ", img_ten.size())
     plt.show()
 
-    # k = torch.randn_like(input=img_ten).abs() / (-2)
     k = -0.5
-
-    delta = torch.tanh((img_ten - 0.5) / (k))
+    delta = torch.tanh((img_ten - 0.5) / k)
     delta = normal(delta)
 
     reverse_transform(minmax(delta)).save(path_to_files_for_article + "delta_pr_Lenna.png")
@@ -296,12 +285,11 @@ def main():
     plt.savefig(path_to_files_for_article + "recovery_convolution_contrast.eps", bbox_inches='tight')
     plt.show()
 
-    print(img_rf.size())
     retina_ganglion = Retina(img_size=img_rf.size(), maximum_in_periphery=110, last_layer=True, collision=1/4)
 
     output = retina_ganglion(img_rf)
     output = normal(output)
-    print(output.size())
+    print("Size after first layer: ", output.size())
 
     plt.imshow(reverse_transform(output))
     plt.savefig(path_to_files_for_article + "final_clear_convolution.eps", bbox_inches='tight')
@@ -317,5 +305,4 @@ def main():
 
 
 if __name__ == "__main__":
-    torch.manual_seed(111)
     main()
